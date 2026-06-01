@@ -1,19 +1,52 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="hHh Lpr lFf">
+
+    <q-header elevated class="bg-primary">
       <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-btn
+          flat
+          dense
+          round
+          icon="menu"
+          aria-label="Menu"
+          @click="toggleLeftDrawer"
+        />
 
-        <q-toolbar-title> ToDo App </q-toolbar-title>
-
+        <q-toolbar-title class="text-weight-bold">
+          To Do App
+        </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      bordered
+      side="left"
+    >
       <q-list>
-        <q-item-label header> Навигация </q-item-label>
+        <q-item-label header>
+          Навигация
+        </q-item-label>
 
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
+        <q-item clickable v-ripple to="/" exact>
+          <q-item-section avatar>
+            <q-icon name="list" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Задачи</q-item-label>
+          </q-item-section>
+        </q-item>
+
+        <q-item clickable v-ripple to="/create" exact>
+          <q-item-section avatar>
+            <q-icon name="add_circle_outline" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Создать задачу</q-item-label>
+          </q-item-section>
+        </q-item>
+
       </q-list>
     </q-drawer>
 
@@ -23,22 +56,23 @@
   </q-layout>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+<script lang="ts">
+import { defineComponent, ref } from 'vue'
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Мои задачи',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-];
+export default defineComponent({
+  name: 'MainLayout',
 
-const leftDrawerOpen = ref(false);
+  setup() {
+    const leftDrawerOpen = ref(false)
 
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
-}
+    const toggleLeftDrawer = (): void => {
+      leftDrawerOpen.value = !leftDrawerOpen.value
+    }
+
+    return {
+      leftDrawerOpen,
+      toggleLeftDrawer
+    }
+  }
+})
 </script>

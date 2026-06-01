@@ -1,45 +1,91 @@
 <template>
-  <div>
-    <p>{{ title }}</p>
 
-    <q-item v-for="todo in todos" :key="todo.id" @click="increment">
-        <q-item-section avatar>
-            <q-checkbox v-model="todo.completed" />
-        </q-item-section>
-        <q-item-section>
-            <q-item-label>{{ todo.title}}</q-item-label>
-        </q-item-section>
-        <q-item-section side>
-            <q-btn flat round dense icon="delete" color="negative" />
-        </q-item-section>
-    </q-item>
+  <q-item>
 
-    <p>Count: {{ todoCount }} / {{ meta.totalCount }}</p>
-    <p>Active: {{ active ? 'yes' : 'no' }}</p>
-    <p>Clicks on todos: {{ clickCount }}</p>
-  </div>
+    <q-card style="width: 100%; display: flex; flex-direction: row; padding: 2rem; ">
+
+    <q-item-section avatar>
+      <q-checkbox
+        :model-value="todo.done"
+        @update:model-value="toggle"
+        color="primary"
+      />
+    </q-item-section>
+
+    <q-item-section>
+      <q-item-label caption>
+        {{ formatDate(todo.date) }}
+      </q-item-label>
+      
+      <q-item-label :class="{ 'text-decoration-line-through text-grey-6': todo.done }">
+        {{ todo.title }}
+      </q-item-label>
+ 
+    </q-item-section>
+
+    <q-item-section side>
+      <q-btn
+        flat
+        round
+        dense
+        icon="delete"
+        color="negative"
+        @click="remove"
+      />
+    </q-item-section>
+
+    </q-card>
+
+  </q-item>
+
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { Todo, Meta } from './models';
+import type { ITodoItem } from '../types/ITodoItem'
+import { Dialog } from 'quasar'
 
 interface Props {
-  title: string;
-  todos?: Todo[];
-  meta: Meta;
-  active: boolean;
+  todo: ITodoItem
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  todos: () => [],
-});
+const props = defineProps<Props>()
 
-const clickCount = ref(0);
-function increment() {
-  clickCount.value += 1;
-  return clickCount.value;
+const emit = defineEmits<{
+  (e: 'toggle', id: number): void
+  (e: 'delete', id: number): void
+}>()
+
+const toggle = () => {
+  emit('toggle', props.todo.id)
 }
 
-const todoCount = computed(() => props.todos.length);
+const remove = () => {
+  Dialog.create({
+    title: 'Окно сообщения',
+    message: `Вы действительно хотите удалить задачу "${props.todo.title}"?`,
+    persistent: true,
+    ok: {
+      label: 'Удалить',
+      color: 'red'
+    },
+    cancel: {
+      label: 'Отмена',
+      flat: true
+    }
+  }).onOk(() => {
+    emit('delete', props.todo.id)
+  })
+}
+
+const formatDate = (date: Date | undefined) => {
+  if (!date) return ''
+  return new Date(date).toLocaleDateString('en-GB')
+}
+
 </script>
+
+<style land="scss" scoped>
+.text-decoration-line-through {
+    text-decoration: line-through;
+}
+</style>
