@@ -41,11 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ITodoItem } from '../types/ITodoItem'
+import type { ToDoItem } from '../types/todo'
 import { Dialog } from 'quasar'
 
 interface Props {
-  todo: ITodoItem
+  todo: ToDoItem
 }
 
 const props = defineProps<Props>()

@@ -1,19 +1,16 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
-const routes: RouteRecordRaw[] = [
+export type RouteName = 'index'
+
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('../layouts/MainLayout.vue'),
     children: [
       {
         path: '',
-        name: 'index',
+        name: 'index' as RouteName,
         component: () => import('../pages/IndexPage.vue')
-      },
-      {
-        path: 'create',
-        name: 'create',
-        component: () => import('../pages/CreateTodo.vue')
       }
     ]
   }

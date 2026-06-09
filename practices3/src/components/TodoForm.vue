@@ -31,31 +31,37 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { useTodoStore } from '@/stores/todoStore'
-
-const props = defineProps();
-const store = useTodoStore();
+import type { TodoCreateRequest } from '@/types/todo'
 
 const title = ref('')
-const formRef = ref()
+const formRef = ref<InstanceType<typeof import('quasar')['QForm']>>()
+const store = useTodoStore();
 
 const emit = defineEmits<{
     (e: 'add-todo', value: string): void
 }>()
 
-const isFormValid = computed(() => {
-    return title.value?.trim().length ?? 0 > 0
+const isFormValid = computed((): boolean => {
+  return (title.value?.trim().length ?? 0) > 0
 })
 
-const onSubmit = async () => {
-    const isValid = await formRef.value.validate()
+const onSubmit = async (): Promise<void> => {
+  const isValid = await formRef.value?.validate()
     if (!isValid) return
 
-    store.addTodo(title.value.trim() );
-    title.value = '';
+    const request: TodoCreateRequest = {
+        title: title.value.trim()
+    }
 
-    formRef.value.resetValidation();
+    const success = store.addTodo(request)
+    
+    if (success) {
+    title.value = ''
+    formRef.value?.resetValidation()
+  }
 }
+
 
 </script>

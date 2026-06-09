@@ -38,14 +38,6 @@
           </q-item-section>
         </q-item>
 
-        <q-item clickable v-ripple to="/create" exact>
-          <q-item-section avatar>
-            <q-icon name="add_circle_outline" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Создать задачу</q-item-label>
-          </q-item-section>
-        </q-item>
 
       </q-list>
     </q-drawer>

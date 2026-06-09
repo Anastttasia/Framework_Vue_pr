@@ -60,6 +60,7 @@ import { useTodoSearch } from '../composables/useTodoSearch'
 
 import TodoForm from '../components/TodoForm.vue';
 import TodoList from '../components/TodoList.vue';
+import type { TodoFilter } from '../types/todo'
 
 const todoStore = useTodoStore()
 const todosRef = toRef(todoStore, 'todos')
@@ -68,9 +69,9 @@ const { filter, filteredTodos, setFilter } = useTodoFilter(todosRef)
 const { searchedTodos: finalTodos } = useTodoSearch(filteredTodos, searchQuery)
 
 const filterOptions = computed(() => [
-  { label: 'Все задачи', value: 'all' },
-  { label: 'Активные задачи', value: 'active' },
-  { label: 'Выполненные задачи', value: 'done' }
+  { label: 'Все', value: 'all' as TodoFilter },
+  { label: 'Активные', value: 'active' as TodoFilter },
+  { label: 'Выполненные', value: 'done' as TodoFilter }
 ])
 
 

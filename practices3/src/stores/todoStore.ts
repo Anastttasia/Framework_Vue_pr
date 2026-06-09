@@ -1,39 +1,66 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { ITodoItem } from '../types/ITodoItem'
-import { useLocalStorage } from '@/composables/useLocalStorage'
+import type { TodoItem, TodoCreateRequest } from '../types/todo'
+import { useLocalStorage } from '../composables/useLocalStorage'
+import { TodoService } from '../services/todoService'
+import { isValidationError, isNotFoundError, type AppError } from '../types/errors'
+
+export interface TodoStoreState {
+  todos: TodoItem[]
+  error: AppError | null
+}
 
 export const useTodoStore = defineStore('todo', () => {
-  const todos = useLocalStorage<ITodoItem[]>('todos', [])
+  const todos = useLocalStorage<TodoItem[]>('todos', [])
+  const error = ref<AppError | null>(null)
 
-  const addTodo = (title: string): void => {
-    const newTodo: ITodoItem = {
-      id: Date.now(),
-      date: new Date(),
-      title,
-      done: false
+  const addTodo = (request: TodoCreateRequest): boolean => {
+    const result = TodoService.createTodo(request)
+
+    if (!result.success) {
+      error.value = result.error
+      return false
     }
-    todos.value.push(newTodo)
+
+    todos.value.push(result.data)
+    error.value = null
+    return true
   }
 
-  const removeTodo = (id: number): void => {
-    const index = todos.value.findIndex(t => t.id === id)
-    if (index !== -1) {
-      todos.value.splice(index, 1)
+  const removeTodo = (id: number): boolean => {
+    const result = TodoService.removeTodo(todos.value, id)
+
+    if (!result.success) {
+      error.value = result.error
+      return false
     }
+
+    error.value = null
+    return true
   }
 
-  const toggleTodo = (id: number): void => {
-    const todo = todos.value.find(t => t.id === id)
-    if (todo) {
-      todo.done = !todo.done
+  const toggleTodo = (id: number): boolean => {
+    const result = TodoService.toggleTodo(todos.value, id)
+
+    if (!result.success) {
+      error.value = result.error
+      return false
     }
+
+    error.value = null
+    return true
+  }
+
+  const clearError = (): void => {
+    error.value = null
   }
 
   return {
     todos,
+    error,
     addTodo,
     removeTodo,
-    toggleTodo
+    toggleTodo,
+    clearError
   }
 })

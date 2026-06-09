@@ -45,7 +45,6 @@ import { computed, ref } from 'vue'
 import { useTodoStore } from '@/stores/todoStore'
 
 const title = ref('')
-const description = ref('')
 const formRef = ref()
 
 const store = useTodoStore();
@@ -68,7 +67,6 @@ const onSubmit = async () => {
 
   store.addTodo(title.value.trim());
   title.value = '';
-  description.value = '';
 
   formRef.value.resetValidation();
 }

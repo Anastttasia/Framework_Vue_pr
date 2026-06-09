@@ -26,11 +26,11 @@
 
 <script setup lang="ts">
 
-import type { ITodoItem } from '../types/ITodoItem'
+import type { TodoItem as TodoItemType } from '../types/todo'
 import TodoItem from '../components/TodoItem.vue'
 
 interface Props {
-  items: ITodoItem[]
+   items: TodoItemType[]
 }
 
 const props = defineProps<Props>()

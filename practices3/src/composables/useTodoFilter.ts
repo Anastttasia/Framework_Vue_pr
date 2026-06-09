@@ -1,29 +1,21 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
-import type { ITodoItem } from '../types/ITodoItem'
-import type { FilterType } from '../types/FilterType'
+import type { TodoItem, TodoFilter } from '../types/todo'
+import { TodoService } from '../services/todoService'
 
 export interface UseTodoFilterReturn {
-  filter: Ref<FilterType>
-  filteredTodos: ComputedRef<ITodoItem[]>
-  setFilter: (value: FilterType) => void
+  filter: Ref<TodoFilter>
+  filteredTodos: ComputedRef<TodoItem[]>
+  setFilter: (value: TodoFilter) => void
 }
 
-export function useTodoFilter(todos: Ref<ITodoItem[]>): UseTodoFilterReturn {
-  const filter = ref<FilterType>('all')
+export function useTodoFilter(todos: Ref<TodoItem[]>): UseTodoFilterReturn {
+  const filter = ref<TodoFilter>('all')
 
-  const filteredTodos = computed<ITodoItem[]>(() => {
-    switch (filter.value) {
-      case 'active':
-        return todos.value.filter(todo => !todo.done)
-      case 'done':
-        return todos.value.filter(todo => todo.done)
-      case 'all':
-      default:
-        return todos.value
-    }
+  const filteredTodos = computed<TodoItem[]>(() => {
+    return TodoService.filterTodos(todos.value, filter.value)
   })
 
-  const setFilter = (value: FilterType): void => {
+  const setFilter = (value: TodoFilter): void => {
     filter.value = value
   }
 
