@@ -1,26 +1,21 @@
-import { computed, type Ref } from 'vue'
+import { computed, type ComputedRef } from 'vue'
+import { useTodoStore } from '../stores/todoStore'
 import type { TodoItem } from '../types/todo'
-import { TodoService } from '../services/todoService'
 
 export interface UseTodoSearchReturn {
-  searchedTodos: Ref<TodoItem[]>
+  searchQuery: ComputedRef<string>
+  searchedTodos: ComputedRef<TodoItem[]>
+  setSearchQuery: (value: string) => void
   clearSearch: () => void
 }
 
-export function useTodoSearch(
-  todos: Ref<TodoItem[]>,
-  searchQuery: Ref<string>
-): UseTodoSearchReturn {
-  const searchedTodos = computed<TodoItem[]>(() => {
-    return TodoService.searchTodos(todos.value, searchQuery.value)
-  })
-
-  const clearSearch = (): void => {
-    searchQuery.value = ''
-  }
+export function useTodoSearch(): UseTodoSearchReturn {
+  const store = useTodoStore()
 
   return {
-    searchedTodos,
-    clearSearch
+    searchQuery: computed(() => store.searchQuery),
+    searchedTodos: computed(() => store.searchedTodos),
+    setSearchQuery: (value: string) => store.setSearchQuery(value),
+    clearSearch: () => store.clearSearch()
   }
 }

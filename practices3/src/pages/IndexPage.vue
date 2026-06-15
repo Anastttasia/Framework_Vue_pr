@@ -17,7 +17,7 @@
       </q-item-section>
 
         <q-btn-toggle
-          v-model="filter"
+           v-model="filterModel"
           toggle-color="primary"
           :options="filterOptions"
           unelevated
@@ -27,7 +27,7 @@
 
         <q-item style="width: 100%;">
         <q-input
-          v-model="searchQuery"
+          v-model="searchModel"
           outlined
           dense
           placeholder="Поиск задачи по названию"
@@ -40,8 +40,13 @@
         </q-input>
       </q-item>
 
+      <div v-if="todoStore.loading" class="text-center q-mt-xl">
+        <q-spinner color="primary" size="40px" />
+      </div>
+
       <TodoList
-        :items="finalTodos"
+        v-else
+        :items="searchedTodos"
         @toggle="toggle"
         @delete="remove"
       />
@@ -52,7 +57,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, toRef } from 'vue'
+import { computed } from 'vue'
 
 import { useTodoStore } from '../stores/todoStore'
 import { useTodoFilter } from '../composables/useTodoFilter'
@@ -63,10 +68,17 @@ import TodoList from '../components/TodoList.vue';
 import type { TodoFilter } from '../types/todo'
 
 const todoStore = useTodoStore()
-const todosRef = toRef(todoStore, 'todos')
-const searchQuery = ref('')
-const { filter, filteredTodos, setFilter } = useTodoFilter(todosRef)
-const { searchedTodos: finalTodos } = useTodoSearch(filteredTodos, searchQuery)
+const filterModel = computed({
+  get: () => todoStore.filter,
+  set: (val: TodoFilter) => todoStore.setFilter(val)
+})
+
+const searchModel = computed({
+  get: () => todoStore.searchQuery,
+  set: (val: string | null) => todoStore.setSearchQuery(val ?? '')
+})
+
+const searchedTodos = computed(() => todoStore.searchedTodos)
 
 const filterOptions = computed(() => [
   { label: 'Все', value: 'all' as TodoFilter },
