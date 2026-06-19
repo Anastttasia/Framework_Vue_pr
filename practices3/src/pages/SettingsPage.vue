@@ -65,38 +65,6 @@
       </q-card-actions>
     </q-card>
 
-    <q-card>
-      <q-card-section>
-        <div class="text-h6 q-mb-md">Статистика</div>
-
-        <q-item>
-          <q-item-section>
-            <q-item-label>Всего задач</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-item-label class="text-weight-bold">{{ todoCounts.total }}</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item>
-          <q-item-section>
-            <q-item-label>Активных</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-item-label class="text-weight-bold text-primary">{{ todoCounts.active }}</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item>
-          <q-item-section>
-            <q-item-label>Выполненных</q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-item-label class="text-weight-bold text-positive">{{ todoCounts.done }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-card-section>
-    </q-card>
   </q-page>
 </template>
 

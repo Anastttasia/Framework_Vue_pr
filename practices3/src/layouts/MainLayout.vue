@@ -13,7 +13,9 @@
         />
 
         <q-toolbar-title class="text-weight-bold">
-          To Do App
+          <q-breadcrumbs class="text-white" active-color="white">
+              To Do App
+          </q-breadcrumbs>
         </q-toolbar-title>
 
         <q-btn
@@ -53,27 +55,38 @@
           Пользователь
         </q-item-label>
 
-        <q-item v-if="!userStore.isAuthenticated" clickable v-ripple @click="mockLogin">
+        <template v-if="userStore.isAuthenticated">
+          <q-item clickable v-ripple to="/settings" exact>
+            <q-item-section avatar>
+              <q-icon name="settings" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Настройки</q-item-label>
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable v-ripple>
+            <q-item-section avatar>
+              <q-icon name="account_circle" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ userStore.username }}</q-item-label>
+              <q-item-label caption>
+                {{ userStore.userSettings.language === 'ru' ? 'Русский' : 'English' }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn flat dense round icon="logout" @click.stop="handleLogout" />
+            </q-item-section>
+          </q-item>
+        </template>
+
+        <q-item v-else clickable v-ripple to="/login">
           <q-item-section avatar>
             <q-icon name="login" />
           </q-item-section>
           <q-item-section>
             <q-item-label>Войти</q-item-label>
-          </q-item-section>
-        </q-item>
-
-        <q-item v-else clickable v-ripple>
-          <q-item-section avatar>
-            <q-icon name="account_circle" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>{{ userStore.username }}</q-item-label>
-            <q-item-label caption>
-              {{ userStore.userSettings.language === 'ru' ? 'Русский' : 'English' }}
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <q-btn flat dense round icon="logout" @click.stop="userStore.logout()" />
           </q-item-section>
         </q-item>
 
@@ -88,9 +101,16 @@
 
 <script lang="ts">
 import { defineComponent, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { useUiStore } from '../stores/uiStore'
 import { useUserStore } from '../stores/userStore'
+
+interface Breadcrumb {
+  label: string
+  icon?: string
+  to?: string
+}
 
 export default defineComponent({
   name: 'MainLayout',
@@ -98,6 +118,8 @@ export default defineComponent({
   setup() {
     const uiStore = useUiStore()
     const userStore = useUserStore()
+    const route = useRoute()
+    const router = useRouter()
     const $q = useQuasar()
 
     watch(() => uiStore.theme, (val) => {
@@ -109,20 +131,32 @@ export default defineComponent({
       set: (val: boolean) => uiStore.setDrawer(val)
     })
 
-    const mockLogin = async () => {
-      const success = await userStore.login('admin', 'admin')
-      if (success) {
-        uiStore.addNotification('Вход выполнен успешно', 'positive')
-      } else {
-        uiStore.addNotification('Ошибка входа', 'negative')
-      }
+    const breadcrumbMap: Record<string, Breadcrumb> = {
+      index: { label: 'Мои задачи', icon: 'list', to: '/' },
+      create: { label: 'Добавить задачу', icon: 'add_circle_outline' },
+      settings: { label: 'Настройки', icon: 'settings' }
+    }
+
+    const breadcrumbs = computed<Breadcrumb[]>(() => {
+      const name = route.name as string
+      const current = breadcrumbMap[name]
+      if (!current) return [{ label: 'Мои задачи', to: '/' }]
+      return name === 'index'
+        ? [current]
+        : [breadcrumbMap.index, current]
+    })
+
+    const handleLogout = () => {
+      userStore.logout()
+      router.push('/login')
     }
 
     return {
       uiStore,
       userStore,
       drawerModel,
-      mockLogin
+      breadcrumbs,
+      handleLogout
     }
   }
 })
